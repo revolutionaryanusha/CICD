@@ -12,13 +12,7 @@ pipeline {
             }
         }
 
-        stage('Debug Docker Login') {
-            steps {
-                script {
-                    sh 'echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin'
-                    }
-            }
-        }
+     
         stage('Build Docker image') {
             steps {
                 script {
