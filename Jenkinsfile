@@ -14,15 +14,18 @@ pipeline {
         stage('Build Docker image') {
             steps {
                 script {
-                    dockerImage = docker.build(registry + ":$BUILD_NUMBER")
+                    // Build the Docker image with a tag based on the Jenkins build number
+                    dockerImage = docker.build("${registry}:${env.BUILD_NUMBER}")
                 }
             }
         }
         stage('Push Docker image to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('', registryCredential) {
-                        dockerImage.push()
+                    // Explicitly define the Docker Hub URL and use credentials to login and push
+                    docker.withRegistry('https://index.docker.io/v1/', registryCredential) {
+                        // Push the Docker image using the build number as the tag
+                        dockerImage.push("${registry}:${env.BUILD_NUMBER}")
                     }
                 }
             }
@@ -33,11 +36,11 @@ pipeline {
             }
             steps {
                 script {
-                    // Sending email notification upon successful build
+                    // Send an email notification upon successful build and push
                     emailext (
                         to: 'i202454@nu.edu.pk', 
-                        subject: "Merging to  main branch ",
-                        body: "successful merge to the main branch was .",
+                        subject: "Successful Build and Push",
+                        body: "The build and push to Docker Hub were successful.",
                         attachLog: true,
                         mimeType: 'text/plain'
                     )
