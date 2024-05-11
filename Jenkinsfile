@@ -1,7 +1,7 @@
 pipeline {
     environment {
         registry = "anusha172000/mlops_assignment_anusha_husnain" 
-        registryCredential = 'docker-hub-credentials' 
+        registryCredential = 'iddocker' 
         dockerImage = ''
     }
     agent any
