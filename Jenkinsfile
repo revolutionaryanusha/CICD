@@ -11,6 +11,14 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/revolutionaryanusha/CICD.git' 
             }
         }
+
+        stage('Debug Docker Login') {
+            steps {
+                script {
+                    sh 'echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin'
+                    }
+            }
+        }
         stage('Build Docker image') {
             steps {
                 script {
