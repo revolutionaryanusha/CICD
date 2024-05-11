@@ -1,27 +1,32 @@
 pipeline {
     environment {
-        registry = "anusha172000/mlops_assignment_anusha_husnain" 
-        registryCredential = 'docker-hub-credentials' 
+        // Define the Docker registry, credential ID, and variable to hold the Docker image
+        registry = "anusha172000/mlops_assignment_anusha_husnain"
+        registryCredential = 'docid' // Corrected to your specified credential ID
         dockerImage = ''
     }
     agent any
+
     stages {
         stage('Get Dockerfile from GitHub') {
             steps {
-                git branch: 'main', url: 'https://github.com/revolutionaryanusha/CICD.git' 
+                // Check out the main branch from your GitHub repository
+                git branch: 'main', url: 'https://github.com/revolutionaryanusha/CICD.git'
             }
         }
         stage('Build Docker image') {
             steps {
                 script {
-                    dockerImage = docker.build(registry + ":$BUILD_NUMBER")
+                    // Build the Docker image with a tag based on the Jenkins build number
+                    dockerImage = docker.build("${registry}:${env.BUILD_NUMBER}")
                 }
             }
         }
         stage('Push Docker image to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('', registryCredential) {
+                    // Login to Docker Hub and push the image using the specified credentials
+                    docker.withRegistry('https://index.docker.io/v1/', registryCredential) {
                         dockerImage.push()
                     }
                 }
@@ -29,15 +34,16 @@ pipeline {
         }
         stage('Send Email Notification') {
             when {
-                branch 'main' 
+                // Only send an email if the build is on the 'main' branch
+                branch 'main'
             }
             steps {
                 script {
-                    // Sending email notification upon successful build
+                    // Send an email notification upon successful build and push
                     emailext (
-                        to: 'i202454@nu.edu.pk', 
-                        subject: "Merging to  main branch ",
-                        body: "successful merge to the main branch was .",
+                        to: 'i202454@nu.edu.pk',
+                        subject: "Successful Build and Push",
+                        body: "The build and push to Docker Hub were successful.",
                         attachLog: true,
                         mimeType: 'text/plain'
                     )
